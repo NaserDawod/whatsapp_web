@@ -49,5 +49,104 @@ namespace Messaging_WebApp.Services
             }
             return contact;
         }
+
+        public List<Message> getMessages(string userName, string contId) {
+            var contact = getContact(userName, contId);
+            if (contact == null)
+            {
+                return null;
+            }
+            return contact.Messages;
+        }
+
+        public Message getMessage(string userName, string contId, int msgId) {
+            var contact = getContact(userName, contId);
+            if (contact == null) {
+                return null;
+            }
+            var msgs = getMessages(userName, contId);
+            var msg = contact.Messages.Find(x => x.Id == msgId);
+            if (msg == null){
+                return null;
+            }
+            return msg;
+        }
+
+        public async void addContact(string userName, string contId, string name, string server) {
+            var user = getUser(userName);
+            if (user == null) {
+
+            }
+            Contact contact = new Contact()
+            {
+                UserId = userName,
+                Name = name,
+                Server = server,
+                Contname = contId,
+                Last = null,
+                Lastdate = null
+            };
+            user.Contacts.Add(contact);
+            _context.Add(contact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async void removeContact(string userName, string contId) {
+            var user = getUser(userName);
+            if (user == null) {
+
+            }
+            var contact = getContact(userName, contId);
+            if (contact == null) {
+
+            }
+            user.Contacts.Remove(contact);
+            _context.Remove(contact);
+            await _context.SaveChangesAsync();
+        }
+        public async void editContact(string userName, string contId, string name, string server) {
+            var contact = getContact(userName, contId);
+            if (contact == null) {
+
+            }
+            contact.Name = name;
+            contact.Server = server;
+            _context.Contact.Update(contact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async void addMessage(string userName, string contId, Message message) {
+            var contact = getContact(userName, contId);
+            if (contact == null) {
+
+            }
+            contact.Messages.Add(message);
+            contact.Last = message.Content.Trim();
+            contact.Lastdate = message.Created;
+            _context.Add(message);
+            _context.Update(contact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async void removeMessage(string userName, string contId, Message message) {
+            var contact = getContact(userName, contId);
+            if (contact == null) {
+
+            }
+            contact.Messages.Remove(message);
+            _context.Remove(message);
+            await _context.SaveChangesAsync();
+        }
+
+        public async void editMessage(string userName, string contId, int msgID, string content) {
+            var contact = getContact(userName, contId);
+            if (contact == null) {
+
+            }
+            var msg = getMessage(userName, contId, msgID);
+            msg.Content = content;
+            _context.Update(msg);
+            await _context.SaveChangesAsync();
+        }
     }
 }

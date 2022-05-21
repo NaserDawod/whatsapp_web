@@ -8,8 +8,8 @@ namespace Messaging_WebApp.Services
 
         public List<Contact> getContacts(string userName);
         public Contact getContact(string userName, string contId);
-
-        public List<Message> messages(string userName, string contId);
+        public List<Message> getMessages(string userName, string contId);
+        public Message getMessage(string userName, string contId, int msgId);
 
         public void addContact(string userName, string contId, string name, string server);
 
@@ -21,6 +21,6 @@ namespace Messaging_WebApp.Services
 
         public void removeMessage(string userName, string contId, Message message);
 
-        public void editMessage(string userName, string contId, string content);
+        public void editMessage(string userName, string contId, int msgID, string content);
     }
 }
