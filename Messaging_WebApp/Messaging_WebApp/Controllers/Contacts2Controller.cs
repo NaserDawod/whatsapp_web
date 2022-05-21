@@ -131,8 +131,8 @@ namespace Messaging_WebApp.Controllers
                     Name = temp.Name,
                     Server = temp.server,
                     Contname = temp.UserID,
-                    Last = "null",
-                    Lastdate = "null"
+                    Last = null,
+                    Lastdate = null
                 };
                 var user = Users.Find(x => x.Username == name);
                 user.Contacts.Add(contact);
@@ -246,9 +246,11 @@ namespace Messaging_WebApp.Controllers
                 {
                     Content = temp.Content,
                     Sent = true,
-                    Created = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss")
+                    Created = DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss")
                 };
                 contact.Messages.Add(mess);
+                contact.Last = temp.Content.Trim();
+                contact.Lastdate = mess.Created;
                 _context.Add(mess);
                 _context.Update(contact);
                 await _context.SaveChangesAsync();
@@ -343,7 +345,7 @@ namespace Messaging_WebApp.Controllers
             {
                 var user = Users.Find(x => x.Username == invite.to);
                 if (user == null) { return NotFound(); }
-                Contact contact = new Contact() { Contname = invite.from, UserId = invite.to, Name = invite.from, Server = invite.server, Last = "null", Lastdate = "null" };
+                Contact contact = new Contact() { Contname = invite.from, UserId = invite.to, Name = invite.from, Server = invite.server, Last = null, Lastdate = null };
                 user.Contacts.Add(contact);
                 _context.Add(contact);
                 await _context.SaveChangesAsync();
@@ -362,8 +364,10 @@ namespace Messaging_WebApp.Controllers
                 if (user == null) { return NotFound(); }
                 var cont = user.Contacts.Find(x => x.Contname == message.from);
                 if (cont == null) { return NotFound(); }
-                Message msg = new Message() { Content = message.content, Sent = false, Created = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") };
+                Message msg = new Message() { Content = message.content, Sent = false, Created = DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss")};
                 cont.Messages.Add(msg);
+                cont.Last = message.content.Trim();
+                cont.Lastdate = msg.Created;
                 _context.Add(msg);
                 _context.Update(cont);
                 await _context.SaveChangesAsync();
