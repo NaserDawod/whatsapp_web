@@ -5,8 +5,6 @@ function change(val) {
 }
 
 async function getUser() {
-    var ip = location.host;
-    console.log(ip)
     var tok = "Bearer " + token
     const r = await fetch('/api/Contacts2/user', {
         method: 'GET',
@@ -67,11 +65,11 @@ async function printUser() {
 async function postContact(uesrname, name, servert) {
     var p = location.host
     var s = await getUser()
-    console.log(s)
-    const d = await fetch(servert + '/api/Contacts2/invitations', {
+    console.log(p)
+    const d = await fetch('https://' + servert + '/api/Contacts2/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: s.username , to: name, server: p })
+        body: JSON.stringify({ from: s.username, to: uesrname, server: p })
     });
     console.log(d)
     var tok = "Bearer " + token
@@ -88,8 +86,10 @@ async function postContact(uesrname, name, servert) {
 
 async function postMessage(contName, message) {
     var s = await getUser()
+    let c = await getContact(contName)
+    c.server = String(c.server)
     console.log(s)
-    const d = await fetch('/api/Contacts2/transfer', {
+    const d = await fetch('https://' + c.server + '/api/Contacts2/transfer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ from: s.username, to: contName, content: message })
@@ -139,7 +139,7 @@ async function printContacts2() {
                     "</div>" +
                     "<div class=\"w-50\">" +
                         "<h5 class=\"mb-1\">" + cont.name + "</h5>" +
-                        "<p class=\"mb-1\" id=\"" + cont.userId + "-m\">" + message + "</p>" +
+                        "<p class=\"mb-1\" id=\"" + cont.contname + "-m\">" + message + "</p>" +
                     "</div>" +
                     "<div class=\"flex-grow-1 text-right\">" +
                         "<div class=\"small time\" id=\"" + cont.contname + "-t\">" + time + "</div>" +
@@ -238,7 +238,7 @@ async function sendMessage2(contname) {
     if ((message.trim()).length === 0) {
         return
     } else {
-        await postMessage(contname, message)
+        await postMessage(contname, message.trim())
         let elem = document.getElementById('chat_p')
         elem.innerHTML += "<div class=\"flex-row d-flex align-self-end self p-1 my-1 mx-3 rounded shadow-sm message-item greenbackground\">" +
                                 "<div class=\"d-flex flex-row\">" +
@@ -259,7 +259,10 @@ function readMessage2(messages) {
     i = 0
     let side = ''
     let color = ''
+    let time = ''
     messages.forEach(msg => {
+        msg.created = String(msg.created)
+        time = msg.created.substring(11)
         if (msg.sent === false) {
             side = 'start'
             color = 'bg-white'
@@ -271,7 +274,7 @@ function readMessage2(messages) {
                     "<div class=\"d-flex flex-row\">" +
                         "<div class=\"body m-1 mr-2\">" + msg.content + "</div>" +
                         "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
-                            msg.created +
+                            time +
                             "<i class=\"fas fa-check-circle\"></i>" +
                         "</div>" +
                     "</div>" +

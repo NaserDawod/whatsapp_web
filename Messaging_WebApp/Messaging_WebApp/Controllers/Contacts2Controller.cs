@@ -246,7 +246,7 @@ namespace Messaging_WebApp.Controllers
                 {
                     Content = temp.Content,
                     Sent = true,
-                    Created = DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss")
+                    Created = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")
                 };
                 contact.Messages.Add(mess);
                 contact.Last = temp.Content.Trim();
@@ -364,7 +364,7 @@ namespace Messaging_WebApp.Controllers
                 if (user == null) { return NotFound(); }
                 var cont = user.Contacts.Find(x => x.Contname == message.from);
                 if (cont == null) { return NotFound(); }
-                Message msg = new Message() { Content = message.content, Sent = false, Created = DateTime.Now.ToString("yyyy’-‘MM’-‘dd’T’HH’:’mm’:’ss")};
+                Message msg = new Message() { Content = message.content, Sent = false, Created = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")};
                 cont.Messages.Add(msg);
                 cont.Last = message.content.Trim();
                 cont.Lastdate = msg.Created;
