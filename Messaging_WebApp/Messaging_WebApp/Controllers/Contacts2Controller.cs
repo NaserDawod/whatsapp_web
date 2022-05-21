@@ -47,7 +47,6 @@ namespace Messaging_WebApp.Controllers
 
     }
 
-    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class Contacts2Controller : Controller
@@ -63,7 +62,7 @@ namespace Messaging_WebApp.Controllers
             var messages = _context.Message.ToList();
             foreach (var user in Users)
             {
-                user.Contacts = contacts.Where(x => x.Contname == user.Username).ToList();
+                user.Contacts = contacts.Where(x => x.UserId == user.Username).ToList();
                 foreach (var contact in user.Contacts)
                 {
                     contact.Messages = messages.Where(x => x.ContactId == contact.Id).ToList();
@@ -128,10 +127,10 @@ namespace Messaging_WebApp.Controllers
                 String name = encode(authorization);
                 Contact contact = new Contact()
                 {
-                    UserId = temp.UserID,
+                    UserId = name,
                     Name = temp.Name,
                     Server = temp.server,
-                    Contname = name,
+                    Contname = temp.UserID,
                     Last = "null",
                     Lastdate = "null"
                 };
@@ -153,7 +152,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -173,7 +172,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -196,7 +195,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -219,7 +218,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -238,7 +237,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -267,7 +266,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -291,7 +290,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -318,7 +317,7 @@ namespace Messaging_WebApp.Controllers
             {
                 String name = encode(authorization);
                 var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.UserId == ContID);
+                var contact = user.Contacts.Find(x => x.Contname == ContID);
                 if (contact == null)
                 {
                     return NotFound();
@@ -344,7 +343,7 @@ namespace Messaging_WebApp.Controllers
             {
                 var user = Users.Find(x => x.Username == invite.to);
                 if (user == null) { return NotFound(); }
-                Contact contact = new Contact() { Contname = invite.to, UserId = invite.from, Name = invite.from, Server = invite.server, Last = null, Lastdate = null };
+                Contact contact = new Contact() { Contname = invite.from, UserId = invite.to, Name = invite.from, Server = invite.server, Last = "null", Lastdate = "null" };
                 user.Contacts.Add(contact);
                 _context.Add(contact);
                 await _context.SaveChangesAsync();
@@ -361,7 +360,7 @@ namespace Messaging_WebApp.Controllers
             {
                 var user = Users.Find(x => x.Username == message.to);
                 if (user == null) { return NotFound(); }
-                var cont = user.Contacts.Find(x => x.UserId == message.from);
+                var cont = user.Contacts.Find(x => x.Contname == message.from);
                 if (cont == null) { return NotFound(); }
                 Message msg = new Message() { Content = message.content, Sent = false, Created = DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") };
                 cont.Messages.Add(msg);

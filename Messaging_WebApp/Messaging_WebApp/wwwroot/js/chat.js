@@ -5,6 +5,8 @@ function change(val) {
 }
 
 async function getUser() {
+    var ip = location.host;
+    console.log(ip)
     var tok = "Bearer " + token
     const r = await fetch('/api/Contacts2/user', {
         method: 'GET',
@@ -60,7 +62,18 @@ async function printUser() {
         "</svg>"
 }
 
+
+
 async function postContact(uesrname, name, servert) {
+    var p = location.host
+    var s = await getUser()
+    console.log(s)
+    const d = await fetch('/api/Contacts2/invitations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: s.username , to: name, server: p })
+    });
+    console.log(d)
     var tok = "Bearer " + token
     const r = await fetch('/api/Contacts2', {
         method: 'POST',
@@ -74,6 +87,14 @@ async function postContact(uesrname, name, servert) {
 }
 
 async function postMessage(contName, message) {
+    var s = await getUser()
+    console.log(s)
+    const d = await fetch('/api/Contacts2/transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: s.username, to: contName, content: message })
+    });
+    console.log(d)
     var tok = "Bearer " + token
     const r = await fetch('/api/Contacts2/' + contName + '/messages', {
         method: 'POST',
@@ -103,7 +124,7 @@ async function printContacts2() {
     let str = ''
 
     contacts.forEach(cont => {
-        str += ("<div class=\"chat-list-item d-flex flex-row w-100 p-2 border-bottom\" onclick=\"showMessages2(" + "\'" + cont.userId + "\'" + ")\">" +
+        str += ("<div class=\"chat-list-item d-flex flex-row w-100 p-2 border-bottom\" onclick=\"showMessages2(" + "\'" + cont.contname + "\'" + ")\">" +
                     "<div id='cont-img'>" +
                         "<img src='/Images/img1.jpg' alt='Profile Photo' class='img-fluid rounded-circle mr-2' style=\"height:50px; max-width: 55px;\">" +
                     "</div>" +
@@ -200,7 +221,7 @@ async function showMessages2(contname) {
     });
 }
 
-async function sendMessage2(curr_user, contname) {
+async function sendMessage2(contname) {
     let message = document.getElementById('typem').value
     document.getElementById('typem').value = ''
     var today = new Date();
@@ -208,7 +229,7 @@ async function sendMessage2(curr_user, contname) {
     if ((message.trim()).length === 0) {
         return
     } else {
-        await postMessage(curr_user, contname, message)
+        await postMessage(contname, message)
         let elem = document.getElementById('chat_p')
         elem.innerHTML += "<div class=\"flex-row d-flex align-self-end self p-1 my-1 mx-3 rounded shadow-sm message-item greenbackground\">" +
                                 "<div class=\"d-flex flex-row\">" +
