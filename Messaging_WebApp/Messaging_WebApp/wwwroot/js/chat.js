@@ -120,20 +120,29 @@ async function addContact2(curr_user) {
 
 async function printContacts2() {
     let message = ''
+    let time = ''
     let contacts = await getContacts()
     let str = ''
 
     contacts.forEach(cont => {
+        if (cont.last == null) {
+            message = ''
+            time = ''
+        } else {
+            message = cont.last
+            cont.lastTalk = String(cont.lastTalk)
+            time = cont.lastTalk.substring(11)
+        }
         str += ("<div class=\"chat-list-item d-flex flex-row w-100 p-2 border-bottom\" onclick=\"showMessages2(" + "\'" + cont.contname + "\'" + ")\">" +
                     "<div id='cont-img'>" +
                         "<img src='/Images/img1.jpg' alt='Profile Photo' class='img-fluid rounded-circle mr-2' style=\"height:50px; max-width: 55px;\">" +
                     "</div>" +
                     "<div class=\"w-50\">" +
                         "<h5 class=\"mb-1\">" + cont.name + "</h5>" +
-                        "<p class=\"mb-1\" id=\"" + cont.userId + "-m\">" + cont.last + "</p>" +
+                        "<p class=\"mb-1\" id=\"" + cont.userId + "-m\">" + message + "</p>" +
                     "</div>" +
                     "<div class=\"flex-grow-1 text-right\">" +
-                        "<div class=\"small time\" id=\"" + cont.userId + "-t\">" + cont.lastTalk + "</div>" +
+                        "<div class=\"small time\" id=\"" + cont.contname + "-t\">" + time + "</div>" +
                     "</div>" +
                 "</div>")
         })
