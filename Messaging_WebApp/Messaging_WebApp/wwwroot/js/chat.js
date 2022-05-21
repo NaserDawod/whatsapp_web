@@ -68,7 +68,7 @@ async function postContact(uesrname, name, servert) {
     var p = location.host
     var s = await getUser()
     console.log(s)
-    const d = await fetch('/api/Contacts2/invitations', {
+    const d = await fetch(servert + '/api/Contacts2/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ from: s.username , to: name, server: p })
