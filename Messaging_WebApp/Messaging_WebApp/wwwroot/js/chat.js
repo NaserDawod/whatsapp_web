@@ -109,11 +109,21 @@ async function postMessage(contName, message) {
 
 async function addContact2(curr_user) {
     let username = document.getElementById('Username').value
+    if ((username.trim()).length === 0) {
+        return
+    }
     let name = document.getElementById('Name').value
+    if ((name.trim()).length === 0) {
+        return
+    }
     let server = document.getElementById('Server').value
+    if ((server.trim()).length === 0) {
+        return
+    }
     document.getElementById('Username').value = ''
     document.getElementById('Name').value = ''
     document.getElementById('Server').value = ''
+
     await postContact(username, name, server)
     await printContacts2()
 }
