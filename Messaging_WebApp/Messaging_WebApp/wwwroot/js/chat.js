@@ -168,7 +168,7 @@ async function showMessages2(contname) {
     elem.innerHTML = "<div class=\"bg-light\">" +
                         "<img src='/Images/img1.jpg' class=\"profileimage\">" +
                         "<span clas=\"d-flex\">" + cont.name + "</span>" +
-                        "<span id=\"contact_name\" clas=\"d-flex\" style=\"display: none;\">" + cont.userid + "</span>" +
+                        "<span id=\"contact_name\" clas=\"d-flex\" style=\"display: none;\">" + cont.contname + "</span>" +
                         "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-search\" viewBox=\"0 0 16 16\">" +
                             "<path d=\"M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z\"/>" +
                         "</svg>" +
@@ -249,12 +249,12 @@ async function showMessages2(contname) {
             //await postMessage(contname, $("#typem").val().trim())
             let message = document.getElementById('typem').value
             await sendMessage2(contname)
-            connection.invoke("Changed", contname, message)
+            connection.invoke("Changed", contname, message, user.username)
         });
-        connection.on("ChangeReceived", async function (contname2, message) {
+        connection.on("ChangeReceived", async function (contname2, message, username) {
             console.log(contname2, message)
             if (contname2 === user.username) {
-                writeMessage(contname2, message)
+                writeMessage(contname2, message, username)
             }
         })
     })
@@ -284,11 +284,14 @@ async function sendMessage2(contname) {
     }
 }
 
-function writeMessage(contname, message) {
+function writeMessage(contname, message, username) {
+    console.log(contname)
     var today = new Date();
     var time = today.getHours() + ":" + today.getMinutes();
     let elem = document.getElementById('chat_p')
-        elem.innerHTML += "<div class=\"flex-row d-flex align-self-start self p-1 my-1 mx-3 rounded shadow-sm message-item greenbackground\">" +
+    let curr_chat = document.getElementById('contact_name')
+    if (curr_chat === username) {
+        elem.innerHTML += "<div class=\"flex-row d-flex align-self-start self p-1 my-1 mx-3 rounded shadow-sm message-item bg-white\">" +
                                 "<div class=\"d-flex flex-row\">" +
                                     "<div class=\"body m-1 mr-2\">" + message + "</div>" +
                                     "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
@@ -297,8 +300,9 @@ function writeMessage(contname, message) {
                                     "</div>" +
                                 "</div>" +
                             "</div>"
-        document.getElementById(contname + '-t').innerText = time
-        document.getElementById(contname + '-m').innerText = message.substr(0, 20)
+    }
+    document.getElementById(username + '-t').innerText = time
+    document.getElementById(username + '-m').innerText = message.substr(0, 20)
 }
 
 function readMessage2(messages) {
