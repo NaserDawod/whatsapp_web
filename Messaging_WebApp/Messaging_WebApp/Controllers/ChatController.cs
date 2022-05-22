@@ -7,9 +7,12 @@ namespace Messaging_WebApp.Controllers
 
     public class ChatController : Controller
     {
-        public IActionResult MainChat(temp t)
-        {
+        public IActionResult MainChat(temp t) {
             return View(t);
+        }
+
+        public IActionResult LogOut() {
+            return RedirectToAction("Login", "Sign");
         }
     }
 }
