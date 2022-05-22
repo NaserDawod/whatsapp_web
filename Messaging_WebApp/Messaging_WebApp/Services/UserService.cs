@@ -9,6 +9,7 @@ namespace Messaging_WebApp.Services
         public static List<User> Users;
         public UserService(Messaging_WebAppContext context) {
             _context = context;
+            Users = _context.User.ToList();
             var contacts = _context.Contact.ToList();
             var messages = _context.Message.ToList();
             foreach (var user in Users)
@@ -52,8 +53,7 @@ namespace Messaging_WebApp.Services
 
         public List<Message> getMessages(string userName, string contId) {
             var contact = getContact(userName, contId);
-            if (contact == null)
-            {
+            if (contact == null) {
                 return null;
             }
             return contact.Messages;
@@ -72,10 +72,10 @@ namespace Messaging_WebApp.Services
             return msg;
         }
 
-        public async void addContact(string userName, string contId, string name, string server) {
+        public async Task<Contact> addContact(string userName, string contId, string name, string server) {
             var user = getUser(userName);
             if (user == null) {
-
+                return null;
             }
             Contact contact = new Contact()
             {
@@ -89,36 +89,39 @@ namespace Messaging_WebApp.Services
             user.Contacts.Add(contact);
             _context.Add(contact);
             await _context.SaveChangesAsync();
+            return contact;
         }
 
-        public async void removeContact(string userName, string contId) {
+        public async Task<User> removeContact(string userName, string contId) {
             var user = getUser(userName);
             if (user == null) {
-
+                return null;
             }
             var contact = getContact(userName, contId);
             if (contact == null) {
-
+                return null;
             }
             user.Contacts.Remove(contact);
             _context.Remove(contact);
             await _context.SaveChangesAsync();
+            return user;
         }
-        public async void editContact(string userName, string contId, string name, string server) {
+        public async Task<Contact> editContact(string userName, string contId, string name, string server) {
             var contact = getContact(userName, contId);
             if (contact == null) {
-
+                return null;
             }
             contact.Name = name;
             contact.Server = server;
             _context.Contact.Update(contact);
             await _context.SaveChangesAsync();
+            return contact;
         }
 
-        public async void addMessage(string userName, string contId, Message message) {
+        public async Task<Message> addMessage(string userName, string contId, Message message) {
             var contact = getContact(userName, contId);
             if (contact == null) {
-
+                return null;
             }
             contact.Messages.Add(message);
             contact.Last = message.Content.Trim();
@@ -126,27 +129,57 @@ namespace Messaging_WebApp.Services
             _context.Add(message);
             _context.Update(contact);
             await _context.SaveChangesAsync();
+            return message;
         }
 
-        public async void removeMessage(string userName, string contId, Message message) {
+        public async Task<Contact> removeMessage(string userName, string contId, Message message) {
             var contact = getContact(userName, contId);
             if (contact == null) {
-
+                return null;
             }
             contact.Messages.Remove(message);
             _context.Remove(message);
             await _context.SaveChangesAsync();
+            return contact;
         }
 
-        public async void editMessage(string userName, string contId, int msgID, string content) {
+        public async Task<Message> editMessage(string userName, string contId, int msgID, string content) {
             var contact = getContact(userName, contId);
             if (contact == null) {
-
+                return null;
             }
             var msg = getMessage(userName, contId, msgID);
             msg.Content = content;
             _context.Update(msg);
             await _context.SaveChangesAsync();
+            return msg;
+        }
+
+        public async Task<Contact> Invite(string from, string to, string server)
+        {
+            var user = Users.Find(x => x.Username == to);
+            if (user == null) { return null; }
+            Contact contact = new Contact() { Contname = from, UserId = to, Name = from, Server = server, Last = null, Lastdate = null };
+            user.Contacts.Add(contact);
+            _context.Add(contact);
+            await _context.SaveChangesAsync();
+            return contact;
+        }
+
+        public async Task<Message> Transfer(string from, string to, string content)
+        {
+            var user = Users.Find(x => x.Username == to);
+            if (user == null) { return null; }
+            var cont = user.Contacts.Find(x => x.Contname == from);
+            if (cont == null) { return null; }
+            Message msg = new Message() { Content = content, Sent = false, Created = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss") };
+            cont.Messages.Add(msg);
+            cont.Last = content.Trim();
+            cont.Lastdate = msg.Created;
+            _context.Add(msg);
+            _context.Update(cont);
+            await _context.SaveChangesAsync();
+            return msg;
         }
     }
 }

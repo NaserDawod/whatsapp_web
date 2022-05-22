@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Messaging_WebApp.Hubs;
+using Messaging_WebApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<Messaging_WebAppContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Messaging_WebAppContext") ?? throw new InvalidOperationException("Connection string 'Messaging_WebAppContext' not found.")));
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

@@ -6,7 +6,7 @@ function change(val) {
 
 async function getUser() {
     var tok = "Bearer " + token
-    const r = await fetch('/api/Contacts2/user', {
+    const r = await fetch('/api/Contacts/user', {
         method: 'GET',
         headers: {
             'Authorization': tok,
@@ -19,7 +19,7 @@ async function getUser() {
 
 async function getContacts() {
     var tok = "Bearer " + token
-    const r = await fetch('/api/Contacts2/', {
+    const r = await fetch('/api/Contacts/', {
         method: 'GET',
         headers: {
             'Authorization': tok,
@@ -32,7 +32,7 @@ async function getContacts() {
 
 async function getContact(contName) {
     var tok = "Bearer " + token
-    const r = await fetch('/api/Contacts2/' + contName, {
+    const r = await fetch('/api/Contacts/' + contName, {
         method: 'GET',
         headers: {
             'Authorization': tok,
@@ -66,7 +66,7 @@ async function postContact(uesrname, name, servert) {
     var p = location.host
     var s = await getUser()
     console.log(p)
-    const d = await fetch('https://' + servert + '/api/Contacts2/invitations', {
+    const d = await fetch('https://' + servert + '/api/Contacts/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ from: s.username, to: uesrname, server: p })
@@ -89,7 +89,7 @@ async function postMessage(contName, message) {
     let c = await getContact(contName)
     c.server = String(c.server)
     console.log(s)
-    const d = await fetch('https://' + c.server + '/api/Contacts2/transfer', {
+    const d = await fetch('https://' + c.server + '/api/Contacts/transfer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ from: s.username, to: contName, content: message })
@@ -142,6 +142,7 @@ async function printContacts2() {
             message = cont.last
             cont.lastTalk = String(cont.lastTalk)
             time = cont.lastTalk.substring(11)
+
         }
         str += ("<div class=\"chat-list-item d-flex flex-row w-100 p-2 border-bottom\" onclick=\"showMessages2(" + "\'" + cont.contname + "\'" + ")\">" +
                     "<div id='cont-img'>" +
@@ -156,8 +157,7 @@ async function printContacts2() {
                     "</div>" +
                 "</div>")
         })
-    str += "<table class='table table-bordered table-striped mb-0'>" +
-            + "</table>"
+    str += "<table class='table table-bordered table-striped mb-0'>" + "</table>"
     document.getElementById('contact_div').innerHTML = str
 }
 
@@ -252,7 +252,6 @@ async function showMessages2(contname) {
             connection.invoke("Changed", contname, message, user.username)
         });
         connection.on("ChangeReceived", async function (contname2, message, username) {
-            console.log(contname2, message)
             if (contname2 === user.username) {
                 writeMessage(contname2, message, username)
             }
@@ -285,11 +284,12 @@ async function sendMessage2(contname) {
 }
 
 function writeMessage(contname, message, username) {
-    console.log(contname)
+    console.log(contname, username)
     var today = new Date();
     var time = today.getHours() + ":" + today.getMinutes();
     let elem = document.getElementById('chat_p')
-    let curr_chat = document.getElementById('contact_name')
+    let curr_chat = document.getElementById('contact_name').innerText
+    console.log(curr_chat)
     if (curr_chat === username) {
         elem.innerHTML += "<div class=\"flex-row d-flex align-self-start self p-1 my-1 mx-3 rounded shadow-sm message-item bg-white\">" +
                                 "<div class=\"d-flex flex-row\">" +

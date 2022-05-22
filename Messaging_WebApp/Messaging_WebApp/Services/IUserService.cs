@@ -11,16 +11,20 @@ namespace Messaging_WebApp.Services
         public List<Message> getMessages(string userName, string contId);
         public Message getMessage(string userName, string contId, int msgId);
 
-        public void addContact(string userName, string contId, string name, string server);
+        public Task<Contact> addContact(string userName, string contId, string name, string server);
 
-        public void removeContact(string userName, string contId);
+        public Task<User> removeContact(string userName, string contId);
 
-        public void editContact(string userName, string contId, string name, string server);
+        public Task<Contact> editContact(string userName, string contId, string name, string server);
 
-        public void addMessage(string userName, string contId, Message message);
+        public Task<Message> addMessage(string userName, string contId, Message message);
 
-        public void removeMessage(string userName, string contId, Message message);
+        public Task<Contact> removeMessage(string userName, string contId, Message message);
 
-        public void editMessage(string userName, string contId, int msgID, string content);
+        public Task<Message> editMessage(string userName, string contId, int msgID, string content);
+
+        public Task<Contact> Invite(string from, string to, string server);
+
+        public Task<Message> Transfer(string from, string to, string content);
     }
 }
