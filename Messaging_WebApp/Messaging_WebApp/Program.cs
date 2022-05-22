@@ -4,6 +4,7 @@ using Messaging_WebApp.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Messaging_WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<Messaging_WebAppContext>(options =>
@@ -11,6 +12,7 @@ builder.Services.AddDbContext<Messaging_WebAppContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -62,4 +64,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Sign}/{action=Login}/{id?}");
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<MyHub>("/myHub");
+});
 app.Run();

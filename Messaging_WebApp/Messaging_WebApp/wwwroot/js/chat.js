@@ -224,20 +224,40 @@ async function showMessages2(contname) {
                                     "</div>" +
                                 "</div>" +
                             "</button>" +
-                            "<input  type=\"text\" class=\"form-control\" aria-label=\"Amount (to the nearest dollar)\" placeholder=\"Type a message\" id=\"typem\">" +
-                            "<div onclick=\"sendMessage2(" + "\'" + contname + "\'" + ")\">" +
+                            "<input type=\"text\" class=\"form-control\" aria-label=\"Amount (to the nearest dollar)\" placeholder=\"Type a message\" id=\"typem\">" +
+                            "<div id=\"send-btn\" >" +
                                 "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-send-fill\" viewBox=\"0 0 16 16\">" +
                                     "<path d=\"M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z\">" +
                                 "</svg>" +
                             "</div>" +
                         "</span>" +
                     "</div>"
+    //onclick =\"sendMessage2(" + "\'" + contname + "\'" + ")\"
     const wage = document.getElementById('typem');
     wage.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             sendMessage2(e);
         }
     });
+    $(async function () {
+        var connection = new signalR.HubConnectionBuilder().withUrl("/myHub").build();
+
+        connection.start();
+        var user = await getUser()
+
+        $("#send-btn").click(async () => {
+            await postMessage(contname, $("#typem").val().trim())
+            connection.invoke("Changed", contname, user.username)
+        });
+        connection.on("ChangeReceived", async function (contname2, usern) {
+            console.log(contname2, usern)
+            if (contname2 === user.username) {
+                await showMessages2(usern)
+            } else {
+                await showMessages2(contname2)
+            }
+        })
+    })
 }
 
 async function sendMessage2(contname) {
