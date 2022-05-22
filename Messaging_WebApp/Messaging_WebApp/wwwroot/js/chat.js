@@ -246,15 +246,15 @@ async function showMessages2(contname) {
         var user = await getUser()
 
         $("#send-btn").click(async () => {
-            await postMessage(contname, $("#typem").val().trim())
-            connection.invoke("Changed", contname, user.username)
+            //await postMessage(contname, $("#typem").val().trim())
+            let message = document.getElementById('typem').value
+            await sendMessage2(contname)
+            connection.invoke("Changed", contname, message)
         });
-        connection.on("ChangeReceived", async function (contname2, usern) {
-            console.log(contname2, usern)
+        connection.on("ChangeReceived", async function (contname2, message) {
+            console.log(contname2, message)
             if (contname2 === user.username) {
-                await showMessages2(usern)
-            } else {
-                await showMessages2(contname2)
+                writeMessage(contname2, message)
             }
         })
     })
@@ -282,6 +282,23 @@ async function sendMessage2(contname) {
         document.getElementById(contname + '-t').innerText = time
         document.getElementById(contname + '-m').innerText = message.substr(0, 20)
     }
+}
+
+function writeMessage(contname, message) {
+    var today = new Date();
+    var time = today.getHours() + ":" + today.getMinutes();
+    let elem = document.getElementById('chat_p')
+        elem.innerHTML += "<div class=\"flex-row d-flex align-self-start self p-1 my-1 mx-3 rounded shadow-sm message-item greenbackground\">" +
+                                "<div class=\"d-flex flex-row\">" +
+                                    "<div class=\"body m-1 mr-2\">" + message + "</div>" +
+                                    "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
+                                        time +
+                                        "<i class=\"fas fa-check-circle\"></i>" +
+                                    "</div>" +
+                                "</div>" +
+                            "</div>"
+        document.getElementById(contname + '-t').innerText = time
+        document.getElementById(contname + '-m').innerText = message.substr(0, 20)
 }
 
 function readMessage2(messages) {

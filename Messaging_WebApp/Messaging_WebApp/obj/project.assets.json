@@ -9511,11 +9511,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\naser\\source\\temp_git\\5ra\\Messaging_WebApp\\Messaging_WebApp\\Messaging_WebApp.csproj",
+      "projectUniqueName": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\Messaging_WebApp.csproj",
       "projectName": "Messaging_WebApp",
-      "projectPath": "C:\\Users\\naser\\source\\temp_git\\5ra\\Messaging_WebApp\\Messaging_WebApp\\Messaging_WebApp.csproj",
+      "projectPath": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\Messaging_WebApp.csproj",
       "packagesPath": "C:\\Users\\naser\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\naser\\source\\temp_git\\5ra\\Messaging_WebApp\\Messaging_WebApp\\obj\\",
+      "outputPath": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\naser\\AppData\\Roaming\\NuGet\\NuGet.Config",
