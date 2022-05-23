@@ -145,7 +145,6 @@
     min-height: 80.5vh;
 }
 
-
 .chatt {
     max-width: fit-content;
     max-height: max-content;
@@ -385,6 +384,28 @@ div#cont-img {
     position: relative;
     max-width: 75%;
     word-break: break-word;
+}
+
+.message-item .options {
+    position: absolute;
+    top: 0;
+    right: -3px;
+    opacity: 0;
+    transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -webkit-transition: all .2s ease-in-out;
+}
+
+.message-item:hover .options {
+	opacity: 1;
+	right: 0;
+}
+
+.del-icon {
+    width: 15px;
+    height: 15px;
+    margin-block-start: unset;
+    margin-right: 3px;
 }
 
 .wrong {

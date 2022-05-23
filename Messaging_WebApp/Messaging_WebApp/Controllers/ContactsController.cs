@@ -96,7 +96,7 @@ namespace Messaging_WebApp.Controllers
             return NotFound();
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPut]
         [Route("{ContID}")]
         public async Task<IActionResult> UpdateContact(string ContID, [Bind("Name,server")] Temp temp, [FromHeader] string authorization)

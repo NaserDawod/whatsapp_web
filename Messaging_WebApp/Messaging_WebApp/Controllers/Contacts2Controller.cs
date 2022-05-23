@@ -18,7 +18,7 @@ namespace Messaging_WebApp.Controllers
 
     public class Temp
     {
-        public String UserID { get; set; }
+        public String? UserID { get; set; }
         public String Name { get; set; }
 
         public String server { get; set; }

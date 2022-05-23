@@ -48,19 +48,9 @@ async function getContact(contName) {
 async function printUser() {
     var user = await getUser()
     let elem = document.getElementById('main-user')
-    elem.innerHTML = "<img src='/Images/img1.jpg' id='user-img' class='profileimage'>" +
-        "<span clas='d-flex'>" + user.name + "</span>" +
-        "<svg asp-action='LogOut' data-bs-toggle='modal' data-bs-target='#staticBackdrop' xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-person-plus fa-5x icon_place' viewBox='0 0 16 16'>" +
-        "<path d='M6 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z'/>" +
-        "<path fill-rule='evenodd' d='M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z'/>" +
-        "</svg>" +
-        "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-door-open icon_place' viewBox='0 0 16 16'>" +
-        "<path d='M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1z'/>" +
-        "<path d='M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5zM4 1.934V15h6V1.077l-6 .857z'/>" +
-        "</svg>"
+    elem.innerHTML += "<img src='/Images/img1.jpg' id='user-img' class='profileimage'>" +
+                    "<span clas='d-flex'>" + user.name + "</span>" 
 }
-
-
 
 async function postContact(uesrname, name, servert) {
     var p = location.host
@@ -73,7 +63,7 @@ async function postContact(uesrname, name, servert) {
     });
     console.log(d)
     var tok = "Bearer " + token
-    const r = await fetch('/api/Contacts2', {
+    const r = await fetch('/api/Contacts', {
         method: 'POST',
         headers: {
             'Authorization': tok,
@@ -96,7 +86,7 @@ async function postMessage(contName, message) {
     });
     console.log(d)
     var tok = "Bearer " + token
-    const r = await fetch('/api/Contacts2/' + contName + '/messages', {
+    const r = await fetch('/api/Contacts/' + contName + '/messages', {
         method: 'POST',
         headers: {
             'Authorization': tok,
@@ -128,28 +118,74 @@ async function addContact2(curr_user) {
     await printContacts2()
 }
 
+async function updateContact() {
+    let new_name = document.getElementById('new-name').value
+    if ((new_name.trim()).length === 0) {
+        return
+    }
+    let new_server = document.getElementById('new-server').value
+    if ((new_server.trim()).length === 0) {
+        return
+    }
+
+    document.getElementById('new-name').value = ''
+    document.getElementById('new-server').value = ''
+    let curr_chat = document.getElementById('contact_name').innerText
+    var tok = "Bearer " + token
+    const r = await fetch('/api/Contacts/' + curr_chat, {
+        method: 'PUT',
+        headers: {
+            'Authorization': tok,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ Name: new_name, server: new_server })
+    });
+    document.getElementById(curr_chat + '-n').innerText = new_name
+    document.getElementById(curr_chat + '-n2').innerText = new_name
+}
+
+async function removeContact() {
+    let curr_chat = document.getElementById('contact_name').innerText
+    var tok = "Bearer " + token
+    const r = await fetch('/api/Contacts/' + curr_chat, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': tok,
+            'Content-Type': 'application/json'
+        }
+    });
+    await printContacts2()
+    let elem = document.getElementById('messages')
+    elem.innerHTML = "<div class=\"row home h-100 align-items-center\">" + 
+                        "<div class=\"centered\">" + 
+                            "<img class=\"centert\" src=\"~/Images/whatsicon.png\" height=\"170px\" alt=\"\">" +
+                                "<h4 class=\"wellcome centert2\">Wellcome to whats app web app!! </h4>" +
+                        "</div>" +
+                    "</div>"
+}
+
+
+
 async function printContacts2() {
     let message = ''
     let time = ''
     let contacts = await getContacts()
     let str = ''
-
     contacts.forEach(cont => {
         if (cont.last == null) {
             message = ''
             time = ''
         } else {
             message = cont.last
-            cont.lastTalk = String(cont.lastTalk)
-            time = cont.lastTalk.substring(11)
-
+            cont.lastdate = String(cont.lastdate)
+            time = cont.lastdate.substring(11)
         }
         str += ("<div class=\"chat-list-item d-flex flex-row w-100 p-2 border-bottom\" onclick=\"showMessages2(" + "\'" + cont.contname + "\'" + ")\">" +
                     "<div id='cont-img'>" +
                         "<img src='/Images/img1.jpg' alt='Profile Photo' class='img-fluid rounded-circle mr-2' style=\"height:50px; max-width: 55px;\">" +
                     "</div>" +
                     "<div class=\"w-50\">" +
-                        "<h5 class=\"mb-1\">" + cont.name + "</h5>" +
+                        "<h5 class=\"mb-1\" id=\"" + cont.contname + "-n\">" + cont.name + "</h5>" +
                         "<p class=\"mb-1\" id=\"" + cont.contname + "-m\">" + message + "</p>" +
                     "</div>" +
                     "<div class=\"flex-grow-1 text-right\">" +
@@ -167,7 +203,7 @@ async function showMessages2(contname) {
     console.log(cont)
     elem.innerHTML = "<div class=\"bg-light\">" +
                         "<img src='/Images/img1.jpg' class=\"profileimage\">" +
-                        "<span clas=\"d-flex\">" + cont.name + "</span>" +
+                        "<span clas=\"d-flex\" id=\"" + cont.contname + "-n2\">" + cont.name + "</span>" +
                         "<span id=\"contact_name\" clas=\"d-flex\" style=\"display: none;\">" + cont.contname + "</span>" +
                         "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-search\" viewBox=\"0 0 16 16\">" +
                             "<path d=\"M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z\"/>" +
@@ -177,8 +213,8 @@ async function showMessages2(contname) {
                                 "<path d=\"M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z\"/>" +
                             "</svg>" +
                             "<div class=\"dropdown-content\">" +
-                                "<div class=\"biclips2\">Info</div>" +
-                                "<div class=\"biclips2\">Delete chat</div>" +
+                                "<div class=\"biclips2\" data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop4\">Info</div>" +
+                                "<div class=\"biclips2\" data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop3\">Delete chat</div>" +
                                 "<div class=\"biclips2\">Mute</div>" +
                             "</div>" +
                         "</button>" +
@@ -205,7 +241,7 @@ async function showMessages2(contname) {
                                         "</svg>" +
                                     "</div>" +
                                     "<div>" +
-                                        "<svg xmlns=\"http://www.w3.org/2000/svg\" onclick=\"sendvoice()\" data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop4\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-mic-fill biclips\" viewBox=\"0 0 16 16\">" +
+                                        "<svg xmlns=\"http://www.w3.org/2000/svg\"  width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-mic-fill biclips\" viewBox=\"0 0 16 16\">" +
                                             "<path d=\"M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z\"/>" +
                                             "<path d=\"M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z\"/>" +
                                         "</svg>" +
@@ -246,7 +282,6 @@ async function showMessages2(contname) {
         var user = await getUser()
 
         $("#send-btn").click(async () => {
-            //await postMessage(contname, $("#typem").val().trim())
             let message = document.getElementById('typem').value
             await sendMessage2(contname)
             connection.invoke("Changed", contname, message, user.username)
@@ -311,17 +346,30 @@ function readMessage2(messages) {
     let side = ''
     let color = ''
     let time = ''
+    let delet = "<svg xmlns='http://www.w3.org/2000/svg' data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop5\" fill='currentColor' class='bi bi-trash del-icon' viewBox='0 0 16 16'>" +
+                    "<path d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z' />" +
+                    "<path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z' />" +
+                "</svg>"
+    let edit = ''
     messages.forEach(msg => {
         msg.created = String(msg.created)
         time = msg.created.substring(11)
         if (msg.sent === false) {
             side = 'start'
             color = 'bg-white'
+            edit = ''
         } else {
             side = 'end'
             color = 'greenbackground'
+            edit = "<svg xmlns='http://www.w3.org/2000/svg' data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop6\" fill='currentColor' class='bi bi-pencil del-icon' viewBox='0 0 16 16'>" +
+                        "<path d='M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z' />" +
+                    "</svg>"
         }
         str += "<div class=\"flex-row d-flex align-self-" + side + " self p-1 my-1 mx-3 rounded shadow-sm message-item " + color + "\">" +
+                    "<div class='options'>" +
+                        delet +
+                        edit +
+                    "</div>" +
                     "<div class=\"d-flex flex-row\">" +
                         "<div class=\"body m-1 mr-2\">" + msg.content + "</div>" +
                         "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
@@ -330,7 +378,13 @@ function readMessage2(messages) {
                         "</div>" +
                     "</div>" +
                 "</div>"
+              + "<span id=\"contact_name\" style=\"display: none;\">" + msg.id + "</span>"
         i++
     });
     return str
+}
+
+
+async function removeMessage() {
+
 }
