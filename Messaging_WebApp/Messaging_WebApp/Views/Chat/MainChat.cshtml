@@ -88,6 +88,27 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="staticBackdrop6" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Edit message</h5>
+                <button type="button" @*onclick="hide()"*@ class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="recipient-name" class="col-form-label">Content:</label>
+                    <input type="text" class="form-control" id="new-content" onfocus="this.value='';">
+                </div>
+                <p class="message wrong" id="n-exist">Wrong input</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="hide()">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateMessage()" >Update</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row container-fluid">
     <div class="col-4 right-pad" style="border-right: 0.2vh solid lightgray;">
         <div id="main-user" class="bg-light" style="width: 100%;"> 
