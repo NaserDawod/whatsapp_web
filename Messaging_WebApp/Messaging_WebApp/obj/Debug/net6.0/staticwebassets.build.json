@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "XIsJuQDZLIQg3e5ly9JgTZOnqLTw2XZXpr0NfiayH78=",
+  "Hash": "AU8GbKvV43gC7B9/OPKCbCYIruqHie4ngYAzu+sJ2zA=",
   "Source": "Messaging_WebApp",
   "BasePath": "_content/Messaging_WebApp",
   "Mode": "Default",
@@ -51,12 +51,12 @@
       "OriginalItemSpec": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\obj\\Debug\\net6.0\\scopedcss\\projectbundle\\Messaging_WebApp.bundle.scp.css"
     },
     {
-      "Identity": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\wwwroot\\css\\Index.css",
+      "Identity": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\wwwroot\\css\\index.css",
       "SourceId": "Messaging_WebApp",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\wwwroot\\",
       "BasePath": "_content/Messaging_WebApp",
-      "RelativePath": "css/Index.css",
+      "RelativePath": "css/index.css",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -65,7 +65,7 @@
       "AssetTraitValue": "",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\css\\Index.css"
+      "OriginalItemSpec": "wwwroot\\css\\index.css"
     },
     {
       "Identity": "C:\\Users\\naser\\source\\zbale\\Messaging_WebApp\\Messaging_WebApp\\wwwroot\\css\\site.css",
