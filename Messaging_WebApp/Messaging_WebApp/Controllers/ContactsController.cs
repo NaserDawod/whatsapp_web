@@ -16,6 +16,28 @@ using Messaging_WebApp.Services;
 
 namespace Messaging_WebApp.Controllers
 {
+    public class TempContact
+    {
+        public String Id { get; set; }
+
+        public string Name { get; set; }
+
+        public String Server { get; set; }
+
+        public String? Last { get; set; }
+
+        public String? Lastdate { get; set; }
+    }
+    public class TempMessage
+    {
+        public int Id { get; set; }
+
+        public string Content { get; set; }
+
+        public String Created { get; set; }
+
+        public bool Sent { get; set; }
+    }
     [ApiController]
     [Route("api/[controller]")]
     public class ContactsController : Controller
@@ -26,6 +48,8 @@ namespace Messaging_WebApp.Controllers
         {
             _service = service;
         }
+
+        
 
         public String encode(string authorization)
         {
@@ -61,7 +85,17 @@ namespace Messaging_WebApp.Controllers
                 var name = encode(authorization);
                 var contacts = _service.getContacts(name);
                 if (contacts == null) { return NotFound(); }
-                return Json(contacts);
+                List<TempContact> conts = new List<TempContact>();
+                foreach (var cont in contacts)
+                {
+                    var contact = new TempContact() { Id = cont.Contname, Name = cont.Name,
+                        Server = cont.Server,
+                        Last = cont.Last,
+                        Lastdate = cont.Lastdate
+                    };
+                    conts.Add(contact);
+                }
+                return Json(conts);
             }
             return NotFound();
         }
@@ -91,7 +125,15 @@ namespace Messaging_WebApp.Controllers
                 String name = encode(authorization);
                 var contact = _service.getContact(name, ContID);
                 if (contact == null) { return NotFound(); }
-                return Json(contact);
+                var cont = new TempContact()
+                {
+                    Id = contact.Contname,
+                    Name = contact.Name,
+                    Server = contact.Server,
+                    Last = contact.Last,
+                    Lastdate = contact.Lastdate
+                };
+                return Json(cont);
             }
             return NotFound();
         }
@@ -138,7 +180,19 @@ namespace Messaging_WebApp.Controllers
                 String name = encode(authorization);
                 var messages = _service.getMessages(name, ContID); 
                 if(messages == null) { return NotFound(); }
-                return Json(messages);
+                List<TempMessage> temp_messages = new List<TempMessage>();
+                foreach (var msg in messages)
+                {
+                    var mess = new TempMessage()
+                    {
+                        Id = msg.Id,
+                        Content = msg.Content,
+                        Created = msg.Created,
+                        Sent = msg.Sent
+                    };
+                    temp_messages.Add(mess);
+                }
+                return Json(temp_messages);
             }
             return NotFound();
         }
@@ -172,7 +226,14 @@ namespace Messaging_WebApp.Controllers
                 String name = encode(authorization);
                 var msg = _service.getMessage(name, ContID, msgID);
                 if (msg == null) { return NotFound(); }
-                return Ok(msg);
+                var mess = new TempMessage()
+                {
+                    Id = msg.Id,
+                    Content = msg.Content,
+                    Created = msg.Created,
+                    Sent = msg.Sent
+                };
+                return Ok(mess);
             }
             return NotFound();
         }

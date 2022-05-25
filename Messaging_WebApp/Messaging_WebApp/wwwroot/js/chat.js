@@ -284,9 +284,10 @@ async function showMessages2(contname) {
         $("#send-btn").click(async () => {
             let message = document.getElementById('typem').value
             await sendMessage2(contname)
-            connection.invoke("Changed", contname, message, user.username)
+            //connection.invoke("Changed", contname, message, user.username)
         });
         connection.on("ChangeReceived", async function (contname2, message, username) {
+            console.log("fuck")
             if (contname2 === user.username) {
                 writeMessage(contname2, message, username)
             }

@@ -12,11 +12,14 @@ using Microsoft.EntityFrameworkCore;
 using Messaging_WebApp.Data;
 using Messaging_WebApp.Models;
 using System.IdentityModel.Tokens.Jwt;
+using Messaging_WebApp.Services;
+using Messaging_WebApp.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Messaging_WebApp.Controllers
 {
 
-    public class Temp
+        public class Temp
     {
         public String? UserID { get; set; }
         public String Name { get; set; }
@@ -46,28 +49,17 @@ namespace Messaging_WebApp.Controllers
         public String content { get; set; }
 
     }
-
     [ApiController]
     [Route("api/[controller]")]
     public class Contacts2Controller : Controller
     {
-        private readonly Messaging_WebAppContext _context;
-        public static List<User> Users;
+        public IUserService _service;
+        readonly IHubContext<MyHub> _hub;
 
-        public Contacts2Controller(Messaging_WebAppContext context)
+        public Contacts2Controller(IUserService service, IHubContext<MyHub> hub)
         {
-            _context = context;
-            Users = _context.User.ToList();
-            var contacts = _context.Contact.ToList();
-            var messages = _context.Message.ToList();
-            foreach (var user in Users)
-            {
-                user.Contacts = contacts.Where(x => x.UserId == user.Username).ToList();
-                foreach (var contact in user.Contacts)
-                {
-                    contact.Messages = messages.Where(x => x.ContactId == contact.Id).ToList();
-                }
-            }
+            _service = service;
+            _hub = hub;
         }
 
         public String encode(string authorization)
@@ -87,15 +79,10 @@ namespace Messaging_WebApp.Controllers
         {
             if (!string.IsNullOrEmpty(authorization))
             {
-                var stream = authorization.Remove(0, 7);
-                var handler = new JwtSecurityTokenHandler();
-                var jsonToken = handler.ReadToken(stream);
-                var tokenS = jsonToken as JwtSecurityToken;
-                var name = tokenS.Claims.ElementAt(3).Value;
-                var user = _context.User.Where(x => x.Username == name);
-                if (user == null)
-                    return NotFound();
-                return Json(user.First());
+                var name = encode(authorization);
+                var user = _service.getUser(name);
+                if (user == null) { return NotFound(); }
+                return Json(user);
             }
             return NotFound();
         }
@@ -106,13 +93,10 @@ namespace Messaging_WebApp.Controllers
         {
             if (!string.IsNullOrEmpty(authorization))
             {
-                String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                if (user == null)
-                {
-                    return NotFound();
-                }
-                return Json(user.Contacts);
+                var name = encode(authorization);
+                var contacts = _service.getContacts(name);
+                if (contacts == null) { return NotFound(); }
+                return Json(contacts);
             }
             return NotFound();
         }
@@ -125,20 +109,9 @@ namespace Messaging_WebApp.Controllers
             if (ModelState.IsValid)
             {
                 String name = encode(authorization);
-                Contact contact = new Contact()
-                {
-                    UserId = name,
-                    Name = temp.Name,
-                    Server = temp.server,
-                    Contname = temp.UserID,
-                    Last = null,
-                    Lastdate = null
-                };
-                var user = Users.Find(x => x.Username == name);
-                user.Contacts.Add(contact);
-                _context.Add(contact);
-                await _context.SaveChangesAsync();
-                return Ok(contact);
+                var contact = await _service.addContact(name, temp.UserID, temp.Name, temp.server);
+                if (contact == null) { return NotFound(); }
+                return Ok();
             }
             return BadRequest();
         }
@@ -151,18 +124,14 @@ namespace Messaging_WebApp.Controllers
             if (!string.IsNullOrEmpty(ContID))
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
+                var contact = _service.getContact(name, ContID);
+                if (contact == null) { return NotFound(); }
                 return Json(contact);
             }
             return NotFound();
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPut]
         [Route("{ContID}")]
         public async Task<IActionResult> UpdateContact(string ContID, [Bind("Name,server")] Temp temp, [FromHeader] string authorization)
@@ -171,17 +140,9 @@ namespace Messaging_WebApp.Controllers
                 !string.IsNullOrEmpty(temp.server))
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
-                contact.Name = temp.Name;
-                contact.Server = temp.server;
-                _context.Contact.Update(contact);
-                await _context.SaveChangesAsync();
-                return Ok(contact);
+                var contact = await _service.editContact(name, ContID, temp.Name, temp.server);
+                if (contact == null) { return NotFound(); }
+                return Ok();
             }
             return NotFound();
         }
@@ -194,16 +155,9 @@ namespace Messaging_WebApp.Controllers
             if (!string.IsNullOrEmpty(ContID))
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
-                user.Contacts.Remove(contact);
-                _context.Contact.Remove(contact);
-                await _context.SaveChangesAsync();
-                return Ok(contact);
+                var remove = await _service.removeContact(name, ContID);
+                if (remove == null) { return NotFound(); }
+                return Ok();
             }
             return NotFound();
         }
@@ -217,13 +171,9 @@ namespace Messaging_WebApp.Controllers
             if (!string.IsNullOrEmpty(ContID))
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
-                return Json(contact.Messages);
+                var messages = _service.getMessages(name, ContID);
+                if (messages == null) { return NotFound(); }
+                return Json(messages);
             }
             return NotFound();
         }
@@ -236,25 +186,15 @@ namespace Messaging_WebApp.Controllers
             if (!string.IsNullOrEmpty(temp.Content))
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
                 Message mess = new Message()
                 {
                     Content = temp.Content,
                     Sent = true,
                     Created = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")
                 };
-                contact.Messages.Add(mess);
-                contact.Last = temp.Content.Trim();
-                contact.Lastdate = mess.Created;
-                _context.Add(mess);
-                _context.Update(contact);
-                await _context.SaveChangesAsync();
-                return Ok(mess);
+                var check = await _service.addMessage(name, ContID, mess);
+                if (check == null) { return NotFound(); }
+                return Ok();
             }
             return NotFound();
         }
@@ -267,18 +207,9 @@ namespace Messaging_WebApp.Controllers
             if (!string.IsNullOrEmpty(ContID))
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
-                var mess = contact.Messages.Find(x => x.Id == msgID);
-                if (mess == null)
-                {
-                    return NotFound();
-                }
-                return Json(mess);
+                var msg = _service.getMessage(name, ContID, msgID);
+                if (msg == null) { return NotFound(); }
+                return Json(msg);
             }
             return NotFound();
         }
@@ -291,21 +222,9 @@ namespace Messaging_WebApp.Controllers
             if (!string.IsNullOrEmpty(ContID) && ModelState.IsValid)
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
-                var mess = contact.Messages.Find(x => x.Id == msgID);
-                if (mess == null)
-                {
-                    return NotFound();
-                }
-                mess.Content = temp.Content;
-                _context.Update(mess);
-                await _context.SaveChangesAsync();
-                return Ok(mess);
+                var mess = await _service.editMessage(name, ContID, msgID, temp.Content);
+                if (mess == null) { return NotFound(); }
+                return Ok();
             }
             return NotFound();
         }
@@ -313,26 +232,15 @@ namespace Messaging_WebApp.Controllers
         [Authorize]
         [HttpDelete]
         [Route("{ContID}/messages/{msgID}")]
-        public async Task<IActionResult> DeleteMessage(string ContID, int msgID, [Bind("Content")] Temp2 temp, [FromHeader] string authorization)
+        public async Task<IActionResult> DeleteMessage(string ContID, int msgID, [FromHeader] string authorization)
         {
             if (!string.IsNullOrEmpty(ContID) && ModelState.IsValid)
             {
                 String name = encode(authorization);
-                var user = Users.Find(x => x.Username == name);
-                var contact = user.Contacts.Find(x => x.Contname == ContID);
-                if (contact == null)
-                {
-                    return NotFound();
-                }
-                var mess = contact.Messages.Find(x => x.Id == msgID);
-                if (mess == null)
-                {
-                    return NotFound();
-                }
-                contact.Messages.Remove(mess);
-                _context.Remove(mess);
-                await _context.SaveChangesAsync();
-                return Ok(contact);
+                var mess = _service.getMessage(name, ContID, msgID);
+                if (mess == null) { return NotFound(); }
+                await _service.removeMessage(name, ContID, mess);
+                return Ok();
             }
             return NotFound();
         }
@@ -343,13 +251,9 @@ namespace Messaging_WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = Users.Find(x => x.Username == invite.to);
-                if (user == null) { return NotFound(); }
-                Contact contact = new Contact() { Contname = invite.from, UserId = invite.to, Name = invite.from, Server = invite.server, Last = null, Lastdate = null };
-                user.Contacts.Add(contact);
-                _context.Add(contact);
-                await _context.SaveChangesAsync();
-                return Ok(contact);
+                var contact = await _service.Invite(invite.from, invite.to, invite.server);
+                if (contact == null) { return NotFound(); }
+                return Ok();
             }
             return BadRequest();
         }
@@ -360,21 +264,15 @@ namespace Messaging_WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = Users.Find(x => x.Username == message.to);
-                if (user == null) { return NotFound(); }
-                var cont = user.Contacts.Find(x => x.Contname == message.from);
-                if (cont == null) { return NotFound(); }
-                Message msg = new Message() { Content = message.content, Sent = false, Created = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")};
-                cont.Messages.Add(msg);
-                cont.Last = message.content.Trim();
-                cont.Lastdate = msg.Created;
-                _context.Add(msg);
-                _context.Update(cont);
-                await _context.SaveChangesAsync();
-                return Ok(msg);
+                var msg = await _service.Transfer(message.from, message.to, message.content);
+                if (msg == null) { return BadRequest(); }
+                await _hub.Clients.All.SendAsync("ChangeReceived", message.to, message.content, message.from);
+                return Ok();
             }
             return BadRequest();
         }
     }
 }
+
+
 
