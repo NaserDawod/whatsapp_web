@@ -13,6 +13,8 @@ using Messaging_WebApp.Data;
 using Messaging_WebApp.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Messaging_WebApp.Services;
+using Microsoft.AspNetCore.SignalR;
+using Messaging_WebApp.Hubs;
 
 namespace Messaging_WebApp.Controllers
 {
@@ -43,13 +45,15 @@ namespace Messaging_WebApp.Controllers
     public class ContactsController : Controller
     {
         public IUserService _service;
+        readonly IHubContext<MyHub> _hub;
 
-        public ContactsController(IUserService service)
+        public ContactsController(IUserService service, IHubContext<MyHub> hub)
         {
             _service = service;
+            _hub = hub;
         }
 
-        
+
 
         public String encode(string authorization)
         {
@@ -290,6 +294,7 @@ namespace Messaging_WebApp.Controllers
             {
                 var msg = await _service.Transfer(message.from, message.to, message.content);
                 if (msg == null) { return BadRequest(); }
+                await _hub.Clients.All.SendAsync("ChangeReceived", message.to, message.content, message.from, msg.Id);
                 return Ok();
             }
             return BadRequest();

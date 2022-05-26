@@ -67,13 +67,11 @@ async function printUser() {
 async function postContact(uesrname, name, servert) {
     var p = location.host
     var s = await getUser()
-    console.log(p)
-    const d = await fetch('https://' + servert + '/api/Contacts2/invitations', {
+    const d = await fetch('https://' + servert + '/api/Contacts/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ from: s.username, to: uesrname, server: p })
     });
-    console.log(d)
     var tok = "Bearer " + token
     const r = await fetch('/api/Contacts2', {
         method: 'POST',
@@ -83,20 +81,17 @@ async function postContact(uesrname, name, servert) {
         },
         body: JSON.stringify({ UserID: uesrname, Name: name, server: servert })
     });
-    console.log(r)
 }
 
 async function postMessage(contName, message) {
     var s = await getUser()
     let c = await getContact(contName)
     c.server = String(c.server)
-    console.log(s)
-    const d = await fetch('https://' + c.server + '/api/Contacts2/transfer', {
+    const d = await fetch('https://' + c.server + '/api/Contacts/transfer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ from: s.username, to: contName, content: message })
     });
-    console.log(d)
     var tok = "Bearer " + token
     const r = await fetch('/api/Contacts2/' + contName + '/messages', {
         method: 'POST',
@@ -106,9 +101,7 @@ async function postMessage(contName, message) {
         },
         body: JSON.stringify({ Content: message })
     });
-    console.log(r)
     const dr = await r.json()
-    console.log(dr)
     return dr.id
 }
 
@@ -215,7 +208,6 @@ async function printContacts2() {
 async function showMessages2(contname) {
     let elem = document.getElementById('messages')
     let cont = await getContact(contname)
-    console.log(cont)
     elem.innerHTML = "<div class=\"bg-light\">" +
         "<img src='/Images/img1.jpg' class=\"profileimage\">" +
         "<span clas=\"d-flex\" id=\"" + cont.contname + "-n2\">" + cont.name + "</span>" +
@@ -283,7 +275,6 @@ async function showMessages2(contname) {
         "</div>" +
         "</span>" +
         "</div>"
-    //onclick =\"sendMessage2(" + "\'" + contname + "\'" + ")\"
     const wage = document.getElementById('typem');
     wage.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
@@ -419,7 +410,6 @@ async function removeMessage() {
             'Content-Type': 'application/json'
         }
     });
-    console.log(r)
     showMessages2(curr_chat)
 }
 
@@ -439,6 +429,5 @@ async function updateMessage() {
         },
         body: JSON.stringify({ Content: new_content })
     });
-    console.log(r)
     document.getElementById(mid + "-m").innerText = new_content
 }
