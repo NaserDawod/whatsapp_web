@@ -308,7 +308,7 @@ async function sendMessage2(contname) {
                                 "</svg>" +
                             "</div>" +
                             "<div class=\"d-flex flex-row\">" +
-                                "<div class=\"body m-1 mr-2\">" + message + "</div>" +
+                                "<div class=\"body m-1 mr-2\" id=\"" + (msg.id) + "-m\" >" + message + "</div>" +
                                 "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
                                 time +
                                 "<i class=\"fas fa-check-circle\"></i>" +
