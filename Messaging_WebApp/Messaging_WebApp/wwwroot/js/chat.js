@@ -55,10 +55,10 @@ async function printUser() {
 
         connection.start();
         var user = await getUser()
-        connection.on("ChangeReceived", async function (contname2, message, username) {
+        connection.on("ChangeReceived", async function (contname2, message, username, id) {
             console.log("fuck")
             if (contname2 === user.username) {
-                writeMessage(contname2, message, username)
+                writeMessage(contname2, message, username, id)
             }
         })
     })
@@ -107,6 +107,9 @@ async function postMessage(contName, message) {
         body: JSON.stringify({ Content: message })
     });
     console.log(r)
+    const dr = await r.json()
+    console.log(dr)
+    return dr.id
 }
 
 async function addContact2(curr_user) {
@@ -301,23 +304,32 @@ async function sendMessage2(contname) {
     if ((message.trim()).length === 0) {
         return
     } else {
-        await postMessage(contname, message.trim())
+        let id = await postMessage(contname, message.trim())
         let elem = document.getElementById('chat_p')
         elem.innerHTML += "<div class=\"flex-row d-flex align-self-end self p-1 my-1 mx-3 rounded shadow-sm message-item greenbackground\">" +
-            "<div class=\"d-flex flex-row\">" +
-            "<div class=\"body m-1 mr-2\">" + message + "</div>" +
-            "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
-            time +
-            "<i class=\"fas fa-check-circle\"></i>" +
-            "</div>" +
-            "</div>" +
-            "</div>"
+                            "<div class='options'>" +
+                                "<svg onclick='set_mid(" + id + ")' xmlns='http://www.w3.org/2000/svg' data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop5\" fill='currentColor' class='bi bi-trash del-icon' viewBox='0 0 16 16'>" +
+                                    "<path d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z' />" +
+                                    "<path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z' />" +
+                                "</svg>" +
+                                "<svg onclick='set_mid(" + id + ")' xmlns='http://www.w3.org/2000/svg' data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop6\" fill='currentColor' class='bi bi-pencil del-icon' viewBox='0 0 16 16'>" +
+                                    "<path d='M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z' />" +
+                                "</svg>" +
+                            "</div>" +
+                            "<div class=\"d-flex flex-row\">" +
+                                "<div class=\"body m-1 mr-2\">" + message + "</div>" +
+                                "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
+                                time +
+                                "<i class=\"fas fa-check-circle\"></i>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>"
         document.getElementById(contname + '-t').innerText = time
         document.getElementById(contname + '-m').innerText = message.substr(0, 20)
     }
 }
 
-function writeMessage(contname, message, username) {
+function writeMessage(contname, message, username, id) {
     console.log(contname, username)
     var today = new Date();
     var time = today.getHours() + ":" + today.getMinutes();
@@ -326,14 +338,20 @@ function writeMessage(contname, message, username) {
     console.log(curr_chat)
     if (curr_chat === username) {
         elem.innerHTML += "<div class=\"flex-row d-flex align-self-start self p-1 my-1 mx-3 rounded shadow-sm message-item bg-white\">" +
-            "<div class=\"d-flex flex-row\">" +
-            "<div class=\"body m-1 mr-2\">" + message + "</div>" +
-            "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
-            time +
-            "<i class=\"fas fa-check-circle\"></i>" +
-            "</div>" +
-            "</div>" +
-            "</div>"
+                            "<div class='options'>" +
+                                "<svg onclick='set_mid(" + id + ")' xmlns='http://www.w3.org/2000/svg' data-bs-toggle=\"modal\" data-bs-target=\"#staticBackdrop5\" fill='currentColor' class='bi bi-trash del-icon' viewBox='0 0 16 16'>" +
+                                    "<path d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z' />" +
+                                    "<path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z' />" +
+                                "</svg>" +
+                            "</div>" +
+                            "<div class=\"d-flex flex-row\">" +
+                                "<div class=\"body m-1 mr-2\">" + message + "</div>" +
+                                "<div class=\"time ml-auto small text-right flex-shrink-0 align-self-end text-muted\" style=\"width:75px;\">" +
+                                time +
+                                "<i class=\"fas fa-check-circle\"></i>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>"
     }
     document.getElementById(username + '-t').innerText = time
     document.getElementById(username + '-m').innerText = message.substr(0, 20)

@@ -31,7 +31,6 @@
             <p class="message wrong" id="n-exist2">this user is already in your contacts</p>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="hide()">Close</button>
             <button type="button" class="btn btn-primary" onclick="addContact2('@Model')" >Understood</button>
         </div>
         </div>
@@ -54,8 +53,7 @@
                 <p class="message wrong" id="n-exist">Wrong input</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="hide()">Close</button>
-                <button type="button" class="btn btn-primary" onclick="updateContact()" >Update</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateContact()" >Update</button>
             </div>
         </div>
     </div>
@@ -68,8 +66,7 @@
                 <button type="button" @*onclick="hide()"*@ class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="hide()">Close</button>
-                <button type="button" class="btn btn-primary" onclick="removeContact()" >Remove</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="removeContact()" >Remove</button>
             </div>
         </div>
     </div>
@@ -82,8 +79,7 @@
                 <button type="button" @*onclick="hide()"*@ class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="hide()">Close</button>
-                <button type="button" class="btn btn-primary" onclick="removeMessage()" >Remove</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="removeMessage()" >Remove</button>
             </div>
         </div>
     </div>
@@ -103,8 +99,7 @@
                 <p class="message wrong" id="n-exist">Wrong input</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="hide()">Close</button>
-                <button type="button" class="btn btn-primary" onclick="updateMessage()" >Update</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="updateMessage()" >Update</button>
             </div>
         </div>
     </div>

@@ -194,7 +194,7 @@ namespace Messaging_WebApp.Controllers
                 };
                 var check = await _service.addMessage(name, ContID, mess);
                 if (check == null) { return NotFound(); }
-                return Ok();
+                return Ok(mess);
             }
             return NotFound();
         }
@@ -266,7 +266,7 @@ namespace Messaging_WebApp.Controllers
             {
                 var msg = await _service.Transfer(message.from, message.to, message.content);
                 if (msg == null) { return BadRequest(); }
-                await _hub.Clients.All.SendAsync("ChangeReceived", message.to, message.content, message.from);
+                await _hub.Clients.All.SendAsync("ChangeReceived", message.to, message.content, message.from, msg.Id);
                 return Ok();
             }
             return BadRequest();
