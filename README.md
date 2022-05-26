@@ -12,6 +12,8 @@ running the server is simple but you need to use the visual studio ide
 here is a short video of how to run the server and creat a new account: 
 https://mega.nz/file/y1tnmaIa#KhXe4UQlz7Ao3k0balvJxFvFROD6CdZ_Rzm3JMQdd4w
 
+the server link is: localhost:7154
+
 now after you run the app you can creat an account via the register page then login and start using the app as normal
 you can add contacts via the add button next to tha name, edit the contact, delete him and you can send, edit, delete messages 
 a huge part was to check the api but since you didnt specify the way that you will check it here are tow ways that you can check that it is working
